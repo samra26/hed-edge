@@ -3,17 +3,7 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
-parser = argparse.ArgumentParser(
-        description='This sample shows how to define custom OpenCV deep learning layers in Python. '
-                    'Holistically-Nested Edge Detection (https://arxiv.org/abs/1504.06375) neural network '
-                    'is used as an example model. Find a pre-trained model at https://github.com/s9xie/hed.')
-parser.add_argument('--input', help='Path to image or video. Skip to capture frames from camera')
-parser.add_argument('--prototxt', help='Path to deploy.prototxt', required=True)
-parser.add_argument('--caffemodel', help='Path to hed_pretrained_bsds.caffemodel', required=True)
-parser.add_argument('--width', help='Resize input image to a specific width', default=256, type=int)
-parser.add_argument('--height', help='Resize input image to a specific height', default=256, type=int)
-parser.add_argument('--savefile', help='Specifies the output video path', default='output.mp4', type=str)
-args = parser.parse_args()
+
 
 class CropLayer(object):
     def __init__(self, params, blobs):
@@ -39,32 +29,44 @@ class CropLayer(object):
     def forward(self, inputs):
         return [inputs[0][:,:,self.ystart:self.yend,self.xstart:self.xend]]
 
-# Load the model.
-net = cv.dnn.readNetFromCaffe(args.prototxt, args.caffemodel)
-cv.dnn_registerLayer('Crop', CropLayer)
-print('file path',args.input)
-image=cv.imread(args.input)
-image=cv.resize(image,(args.width,args.height))
-
-inp = cv.dnn.blobFromImage(image, scalefactor=1.0, size=(args.width, args.height),
+def hed_edge(input_image,prototxt,caffemodel):
+    # Load the model.
+    #prototxt='deploy.prototxt'
+    #caffemodel='hed_pretrained_bsds.caffemodel'
+    net = cv.dnn.readNetFromCaffe(prototxt, caffemodel)
+    
+    scale_percent = 85
+    name=input_image.split()[0]
+    
+    image=cv.imread(input_image)
+    
+    '''width = int(image.shape[1] * scale_percent / 100)
+    height = int(image.shape[0] * scale_percent / 100)
+    image=cv.resize(image,(width,height))'''
+    width=image.shape[1]
+    height=image.shape[0] 
+    inp = cv.dnn.blobFromImage(image, scalefactor=1.0, size=(width, height),
                            mean=(104.00698793, 116.66876762, 122.67891434),
                            swapRB=False, crop=False)
-net.setInput(inp)
-# edges = cv.Canny(image,image.shape[1],image.shape[0])
-out = net.forward()
+    net.setInput(inp)
+    # edges = cv.Canny(image,image.shape[1],image.shape[0])
+    out = net.forward()
 
-out = out[0, 0]
-out = cv.resize(out, (image.shape[1], image.shape[0]))
+    out = out[0, 0]
+    out = cv.resize(out, (image.shape[1], image.shape[0]))
 
-#print(out.shape)
-#out=cv.cvtColor(out,cv.COLOR_GRAY2BGR)
-out = 255 * out
-out = out.astype(np.uint8)
+    print(out.shape)
+    #out=cv.cvtColor(out,cv.COLOR_GRAY2BGR)
+    out = 255 * out
+    out = out.astype(np.uint8)
+    print(input_image)
+    print(time.time())
+    test_folder='edge'
+    #filename = os.path.join(input_image, str(time.time()) + '_edge.png')
+    #cv.imwrite(filename,out)
+    filename=os.path.join(test_folder, name[:-4] + '_edge.png')
+    out=cv.imwrite(filename,out)
+    print(out)
 
-#print(type(out))
-#print(np.max(out))
-#print(np.min(out))
-#print(out.shape)
-#print(image.shape)
-#con=np.concatenate((image,out),axis=1)
-cv.imwrite('out.jpg',out)
+    #cv.dnn_registerLayer('Crop', CropLayer)
+    return out
