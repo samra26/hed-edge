@@ -43,8 +43,8 @@ def hed_edge(input_image,prototxt,caffemodel):
     '''width = int(image.shape[1] * scale_percent / 100)
     height = int(image.shape[0] * scale_percent / 100)
     image=cv.resize(image,(width,height))'''
-    width=image.shape[1]
-    height=image.shape[0] 
+    width=320
+    height=320
     inp = cv.dnn.blobFromImage(image, scalefactor=1.0, size=(width, height),
                            mean=(104.00698793, 116.66876762, 122.67891434),
                            swapRB=False, crop=False)
@@ -53,20 +53,20 @@ def hed_edge(input_image,prototxt,caffemodel):
     out = net.forward()
 
     out = out[0, 0]
-    out = cv.resize(out, (image.shape[1], image.shape[0]))
+    out = cv.resize(out, (320,320))
 
-    print(out.shape)
+    #print(out.shape)
     #out=cv.cvtColor(out,cv.COLOR_GRAY2BGR)
     out = 255 * out
     out = out.astype(np.uint8)
-    print(input_image)
+    #print(input_image)
     #print(time.time())
     test_folder='edge'
     #filename = os.path.join(input_image, str(time.time()) + '_edge.png')
     #cv.imwrite(filename,out)
-    filename=os.path.join(test_folder, name[:-4] + '_edge.png')
-    out=cv.imwrite(filename,out)
-    print(out)
+    #filename=os.path.join(test_folder, name[:-4] + '_edge.png')
+    #out=cv.imwrite('out.jpg',out)
+    #print(out)
 
     #cv.dnn_registerLayer('Crop', CropLayer)
     return out
