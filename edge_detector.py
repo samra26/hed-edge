@@ -60,7 +60,7 @@ def hed_edge(input_image,prototxt,caffemodel):
     out = 255 * out
     out = out.astype(np.uint8)
     print(input_image)
-    print(time.time())
+    #print(time.time())
     test_folder='edge'
     #filename = os.path.join(input_image, str(time.time()) + '_edge.png')
     #cv.imwrite(filename,out)
