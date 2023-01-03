@@ -57,8 +57,8 @@ def hed_edge(input_image,prototxt,caffemodel):
 
     #print(out.shape)
     #out=cv.cvtColor(out,cv.COLOR_GRAY2BGR)
-    out = 255 * out
-    out = out.astype(np.uint8)
+    #out = 255 * out
+    #out = out.astype(np.uint8)
     #print(input_image)
     #print(time.time())
     test_folder='edge'
