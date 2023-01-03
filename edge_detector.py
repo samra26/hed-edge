@@ -42,7 +42,7 @@ class CropLayer(object):
 # Load the model.
 net = cv.dnn.readNetFromCaffe(args.prototxt, args.caffemodel)
 cv.dnn_registerLayer('Crop', CropLayer)
-
+print('file path',args.input)
 image=cv.imread(args.input)
 image=cv.resize(image,(args.width,args.height))
 
